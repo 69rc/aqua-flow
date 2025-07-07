@@ -1,0 +1,100 @@
+Full AI Prompt for Building a Pure Water Company Management App UI
+Prompt:
+
+Design a modern, responsive web application UI for a Pure Water Delivery & Management System used by water companies and their staff.
+
+There are three user roles:
+
+Admin (Water Company Staff)
+
+Delivery Agent (Driver)
+
+Customer (Buyer of water)
+
+Use a clean UI with Tailwind CSS, mobile-first layout, and intuitive navigation. The app should have a navigation sidebar for admin and delivery agents, and top navigation for customers.
+
+🎛️ Admin Dashboard
+Overview cards:
+
+Total Orders (today/week/month)
+
+Active Customers
+
+Total Litres of Water Delivered
+
+Graph: Orders vs. Deliveries (weekly)
+
+Table: Today's Orders
+
+Columns: Order ID, Customer Name, Quantity, Status, Delivery Agent, Actions
+
+Button: Assign Order to Agent
+
+📦 Order Management Page
+List view of all orders with filters (date range, status, agent)
+
+Each order row shows:
+
+Order ID
+
+Customer Name
+
+Address
+
+Quantity (in bags/units)
+
+Status: Pending, In Transit, Delivered, Cancelled
+
+Delivery agent assigned
+
+Add/Edit order form
+
+🚛 Delivery Agent Dashboard
+Today's assigned deliveries
+
+Each card shows:
+
+Customer Name, Address, Phone Number
+
+Water quantity to deliver
+
+Map link or button (opens Google Maps)
+
+Button: Mark as "Delivered" or "Failed"
+
+👥 Customer Dashboard
+Place new order form:
+
+Select number of water bags, delivery address, preferred time
+
+Track order status
+
+Order history with status updates
+
+Feedback form for past orders
+
+🔐 Login / Registration Page
+Role selection at the top (Customer, Agent, Admin)
+
+Login form: Email/Phone + Password
+
+Register form: Name, Contact, Password, Role
+
+⚙️ Optional Pages
+Inventory View (for admin): Track stock of filled bags, raw materials
+
+Staff Performance: Number of deliveries per agent
+
+Notifications Page: Alert admin of delayed deliveries
+
+Customer Support Chat Page
+
+🎨 Style & Design:
+Primary Color: Fresh Blue (#007bff) and Soft White
+
+Icons: Use Lucide or Heroicons (e.g., truck, water drop, user, map)
+
+Rounded cards, soft shadows, responsive design
+
+Use modern font (e.g., Inter or Poppins)
+
