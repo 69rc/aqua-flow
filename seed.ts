@@ -78,6 +78,7 @@ async function seed() {
         email: "alice@example.com",
         phone: "+1234567890",
         address: "123 Main Street, Downtown City",
+        password: "password123",
         isActive: true,
       },
       {
@@ -86,6 +87,7 @@ async function seed() {
         email: "bob@example.com",
         phone: "+1234567891",
         address: "456 Oak Avenue, Westside",
+        password: "password123",
         isActive: true,
       },
       {
@@ -93,6 +95,7 @@ async function seed() {
         email: "carol@example.com",
         phone: "+1234567892",
         address: "789 Pine Road, Northtown",
+        password: "password123",
         isActive: true,
       },
       {
@@ -100,6 +103,7 @@ async function seed() {
         email: "david@example.com",
         phone: "+1234567893",
         address: "321 Elm Street, Southside",
+        password: "password123",
         isActive: true,
       },
       {
@@ -107,6 +111,7 @@ async function seed() {
         email: "emma@example.com",
         phone: "+1234567894",
         address: "654 Maple Drive, East Village",
+        password: "password123",
         isActive: true,
       },
     ]).returning();

@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS customers (
     email TEXT,
     phone TEXT NOT NULL,
     address TEXT NOT NULL,
+    password TEXT,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))

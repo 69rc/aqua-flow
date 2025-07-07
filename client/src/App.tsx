@@ -14,6 +14,8 @@ import InventoryManagement from "@/pages/inventory-management";
 import AgentManagement from "@/pages/agent-management";
 import CustomerManagement from "@/pages/customer-management";
 import Analytics from "@/pages/analytics";
+import CustomerRegister from "@/pages/customer-register";
+import CustomerLogin from "@/pages/customer-login";
 
 function Router() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -33,6 +35,8 @@ function Router() {
     return (
       <Switch>
         <Route path="/" component={Landing} />
+        <Route path="/customer-register" component={CustomerRegister} />
+        <Route path="/customer-login" component={CustomerLogin} />
         <Route component={NotFound} />
       </Switch>
     );

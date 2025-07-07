@@ -6,16 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Package, Droplets, Clock, Star } from "lucide-react";
+import { Plus, Package, Droplets, Clock, Star, Receipt, Download } from "lucide-react";
 import OrderForm from "@/components/forms/order-form";
+import ReceiptGenerator from "@/components/receipts/receipt-generator";
 import type { OrderWithDetails } from "@/types";
 import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/types";
 import { apiRequest } from "@/lib/queryClient";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function CustomerDashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading } = useAuth();
   const [showOrderForm, setShowOrderForm] = useState(false);
+  const [selectedOrderForReceipt, setSelectedOrderForReceipt] = useState<OrderWithDetails | null>(null);
   const queryClient = useQueryClient();
 
   // Redirect if not authenticated
@@ -288,6 +291,47 @@ export default function CustomerDashboard() {
                           <p className="text-sm text-gray-600 mt-2">
                             <span className="font-medium">Notes:</span> {order.notes}
                           </p>
+                        )}
+                        
+                        {/* Receipt Button for completed/delivered orders */}
+                        {(order.status === 'delivered' || order.status === 'in_transit') && (
+                          <div className="mt-3 pt-3 border-t">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={() => setSelectedOrderForReceipt(order)}
+                                >
+                                  <Receipt className="h-4 w-4 mr-2" />
+                                  View Receipt
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-md">
+                                <DialogHeader>
+                                  <DialogTitle>Order Receipt</DialogTitle>
+                                </DialogHeader>
+                                {selectedOrderForReceipt && (
+                                  <ReceiptGenerator 
+                                    order={selectedOrderForReceipt}
+                                    onDownload={() => {
+                                      toast({
+                                        title: "Receipt Downloaded",
+                                        description: "Your receipt has been downloaded successfully.",
+                                      });
+                                    }}
+                                    onPrint={() => {
+                                      toast({
+                                        title: "Receipt Sent to Print",
+                                        description: "Your receipt is being printed.",
+                                      });
+                                    }}
+                                  />
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         )}
                       </div>
                     ))}
