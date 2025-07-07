@@ -67,7 +67,7 @@ export default function Landing() {
               Sign In
             </Button>
             <p className="text-sm text-gray-500 mt-4">
-              For admins, delivery agents, and customers
+              Local development mode • Sample data included
             </p>
           </CardContent>
         </Card>
