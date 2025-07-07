@@ -31,11 +31,7 @@ export default function CustomerLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: CustomerLoginData) => {
-      return await apiRequest("/api/customers/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" },
-      });
+      return await apiRequest("POST", "/api/customers/login", data);
     },
     onSuccess: () => {
       window.location.href = "/customer-dashboard";

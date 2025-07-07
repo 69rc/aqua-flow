@@ -47,11 +47,7 @@ export default function CustomerRegister() {
   const registerMutation = useMutation({
     mutationFn: async (data: CustomerRegisterData) => {
       const { confirmPassword, ...registerData } = data;
-      return await apiRequest("/api/customers/register", {
-        method: "POST",
-        body: JSON.stringify(registerData),
-        headers: { "Content-Type": "application/json" },
-      });
+      return await apiRequest("POST", "/api/customers/register", registerData);
     },
     onSuccess: () => {
       setIsRegistered(true);
