@@ -109,10 +109,10 @@ npm run db:seed
 ```
 
 ### Port Already in Use
-If port 5000 is busy:
+If port5100 is busy:
 ```bash
-# Kill the process using port 5000
-npx kill-port 5000
+# Kill the process using port5100
+npx kill-port5100
 npm run dev
 ```
 
@@ -158,6 +158,6 @@ If you encounter any issues:
 1. Check the console for error messages
 2. Verify all dependencies are installed
 3. Ensure Node.js version is compatible
-4. Check that no other services are using port 5000
+4. Check that no other services are using port5100
 
 The application is designed to work out of the box with minimal setup required!

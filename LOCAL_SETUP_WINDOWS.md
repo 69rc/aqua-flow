@@ -107,10 +107,10 @@ npx tsx setup-db.ts
 npx tsx seed.ts
 ```
 
-#### Port 5000 Already in Use
+#### Port5100 Already in Use
 ```cmd
-# Kill any process using port 5000
-npx kill-port 5000
+# Kill any process using port5100
+npx kill-port5100
 npm run dev
 ```
 

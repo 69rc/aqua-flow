@@ -174,8 +174,8 @@ tsx seed.ts
 
 ### Port Conflicts
 ```bash
-# Kill process on port 5000
-npx kill-port 5000
+# Kill process on port5100
+npx kill-port5100
 npm run dev
 ```
 

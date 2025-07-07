@@ -58,7 +58,7 @@ tsx seed.ts
 
 ### Port Conflicts
 ```bash
-npx kill-port 5000
+npx kill-port5100
 npm run dev
 ```
 
