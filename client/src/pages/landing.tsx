@@ -58,14 +58,36 @@ export default function Landing() {
               Sign in to manage your water delivery operations
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="text-center space-y-4">
             <Button 
               onClick={() => window.location.href = "/api/login"}
               className="w-full"
               size="lg"
             >
-              Sign In
+              Sign In (Admin/Agent)
             </Button>
+            
+            <div className="text-sm text-gray-500">or</div>
+            
+            <div className="space-y-2">
+              <Button 
+                onClick={() => window.location.href = "/customer-login"}
+                variant="outline"
+                className="w-full"
+                size="lg"
+              >
+                Customer Login
+              </Button>
+              <Button 
+                onClick={() => window.location.href = "/customer-register"}
+                variant="ghost"
+                className="w-full"
+                size="sm"
+              >
+                Create Customer Account
+              </Button>
+            </div>
+            
             <p className="text-sm text-gray-500 mt-4">
               Local development mode • Sample data included
             </p>

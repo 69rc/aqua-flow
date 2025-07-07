@@ -114,6 +114,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer authentication routes
+  app.post('/api/customers/register', async (req, res) => {
+    try {
+      const { name, email, phone, address, password } = req.body;
+      
+      // Check if customer already exists
+      const existingCustomers = await storage.getCustomers();
+      const existingCustomer = existingCustomers.find(c => c.email === email);
+      if (existingCustomer) {
+        return res.status(400).json({ message: "Customer with this email already exists" });
+      }
+
+      // Create user and customer records
+      const userId = `customer-${Date.now()}`;
+      await storage.upsertUser({
+        id: userId,
+        email,
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ').slice(1).join(' '),
+        role: 'customer',
+      });
+
+      const customer = await storage.createCustomer({
+        userId,
+        name,
+        email,
+        phone,
+        address,
+        password, // In production, hash this password
+        isActive: true,
+      });
+
+      res.status(201).json({ message: "Customer registered successfully", customer });
+    } catch (error) {
+      console.error("Error registering customer:", error);
+      res.status(500).json({ message: "Failed to register customer" });
+    }
+  });
+
+  app.post('/api/customers/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      const customers = await storage.getCustomers();
+      const customer = customers.find(c => c.email === email);
+      if (!customer || (customer as any).password !== password) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Set session
+      (req.session as any).user = {
+        id: customer.userId,
+        email: customer.email,
+        role: 'customer',
+        firstName: customer.name.split(' ')[0],
+        lastName: customer.name.split(' ').slice(1).join(' '),
+      };
+
+      res.json({ message: "Login successful", customer });
+    } catch (error) {
+      console.error("Error logging in customer:", error);
+      res.status(500).json({ message: "Failed to login" });
+    }
+  });
+
   // Customer routes
   app.get('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
