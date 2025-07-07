@@ -177,6 +177,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch('/api/inventory/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { stock } = req.body;
+      const inventory = await storage.updateInventoryStock(id, stock);
+      res.json(inventory);
+    } catch (error) {
+      console.error("Error updating inventory:", error);
+      res.status(500).json({ message: "Failed to update inventory" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

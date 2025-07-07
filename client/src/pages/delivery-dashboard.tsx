@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/types";
 export default function DeliveryDashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -43,21 +45,33 @@ export default function DeliveryDashboard() {
     return orderDate === today && (order.status === "assigned" || order.status === "in_transit");
   }) || [];
 
+  const updateOrderMutation = useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: number; status: string }) => {
+      const response = await apiRequest("PATCH", `/api/orders/${orderId}`, { status });
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: "Order Updated",
+        description: `Order marked as ${variables.status} successfully`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders/agent", agentId] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update order status",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleMarkDelivered = (orderId: number) => {
-    // TODO: Implement order status update
-    toast({
-      title: "Order Updated",
-      description: "Order marked as delivered successfully",
-    });
+    updateOrderMutation.mutate({ orderId, status: "delivered" });
   };
 
   const handleMarkFailed = (orderId: number) => {
-    // TODO: Implement order status update
-    toast({
-      title: "Order Updated", 
-      description: "Order marked as failed",
-      variant: "destructive",
-    });
+    updateOrderMutation.mutate({ orderId, status: "cancelled" });
   };
 
   const openMaps = (address: string) => {

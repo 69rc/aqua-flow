@@ -10,6 +10,10 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import DeliveryDashboard from "@/pages/delivery-dashboard";
 import CustomerDashboard from "@/pages/customer-dashboard";
 import OrderManagement from "@/pages/order-management";
+import InventoryManagement from "@/pages/inventory-management";
+import AgentManagement from "@/pages/agent-management";
+import CustomerManagement from "@/pages/customer-management";
+import Analytics from "@/pages/analytics";
 
 function Router() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -35,7 +39,7 @@ function Router() {
   }
 
   // Role-based routing for authenticated users
-  const userRole = user?.role;
+  const userRole = (user as any)?.role;
 
   return (
     <Switch>
@@ -43,6 +47,10 @@ function Router() {
         <>
           <Route path="/" component={AdminDashboard} />
           <Route path="/orders" component={OrderManagement} />
+          <Route path="/inventory" component={InventoryManagement} />
+          <Route path="/agents" component={AgentManagement} />
+          <Route path="/customers" component={CustomerManagement} />
+          <Route path="/analytics" component={Analytics} />
         </>
       )}
       {userRole === "delivery_agent" && (

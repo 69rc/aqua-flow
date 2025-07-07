@@ -195,6 +195,7 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   orderNumber: true,
   createdAt: true,
   updatedAt: true,
+  deliveredAt: true,
 });
 export const insertInventorySchema = createInsertSchema(inventory);
 export const insertDeliverySchema = createInsertSchema(deliveries);

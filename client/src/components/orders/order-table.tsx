@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +12,19 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Filter, Download, ChevronLeft, ChevronRight, User } from "lucide-react";
 import type { OrderWithDetails } from "@/types";
+import type { DeliveryAgent } from "@shared/schema";
 import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from "@/types";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface OrderTableProps {
   orders: OrderWithDetails[];
@@ -25,6 +36,37 @@ interface OrderTableProps {
 export default function OrderTable({ orders, isLoading, title, showFilters = false }: OrderTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedAgent, setSelectedAgent] = useState<number | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: agents } = useQuery<DeliveryAgent[]>({
+    queryKey: ["/api/delivery-agents"],
+    retry: false,
+  });
+
+  const assignOrderMutation = useMutation({
+    mutationFn: async ({ orderId, agentId }: { orderId: number; agentId: number }) => {
+      const response = await apiRequest("PATCH", `/api/orders/${orderId}/assign/${agentId}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Assigned",
+        description: "Order has been assigned to delivery agent successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders/today"] });
+      setSelectedAgent(null);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to assign order to agent",
+        variant: "destructive",
+      });
+    },
+  });
   
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -34,8 +76,15 @@ export default function OrderTable({ orders, isLoading, title, showFilters = fal
   });
 
   const handleAssignAgent = (orderId: number) => {
-    // TODO: Implement agent assignment
-    console.log("Assign agent to order:", orderId);
+    if (!selectedAgent) {
+      toast({
+        title: "No Agent Selected",
+        description: "Please select a delivery agent first",
+        variant: "destructive",
+      });
+      return;
+    }
+    assignOrderMutation.mutate({ orderId, agentId: selectedAgent });
   };
 
   const handleViewDetails = (orderId: number) => {
@@ -143,13 +192,31 @@ export default function OrderTable({ orders, isLoading, title, showFilters = fal
                       <TableCell>
                         <div className="flex space-x-2">
                           {!order.deliveryAgentId && order.status === "pending" && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleAssignAgent(order.id)}
-                            >
-                              Assign
-                            </Button>
+                            <div className="flex items-center space-x-2">
+                              <Select 
+                                value={selectedAgent?.toString()} 
+                                onValueChange={(value) => setSelectedAgent(parseInt(value))}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue placeholder="Select agent" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {agents?.map((agent) => (
+                                    <SelectItem key={agent.id} value={agent.id.toString()}>
+                                      {agent.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleAssignAgent(order.id)}
+                                disabled={assignOrderMutation.isPending}
+                              >
+                                Assign
+                              </Button>
+                            </div>
                           )}
                           <Button
                             variant="ghost"
