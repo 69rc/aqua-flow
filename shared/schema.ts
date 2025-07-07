@@ -1,120 +1,120 @@
 import {
-  pgTable,
+  sqliteTable,
   text,
-  varchar,
-  timestamp,
-  jsonb,
-  index,
-  serial,
   integer,
-  decimal,
-  boolean,
-} from "drizzle-orm/pg-core";
+  real,
+  index,
+} from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Session storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
-export const sessions = pgTable(
+export const sessions = sqliteTable(
   "sessions",
   {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
+    sid: text("sid").primaryKey(),
+    sess: text("sess", { mode: "json" }).notNull(),
+    expire: integer("expire", { mode: "timestamp" }).notNull(),
   },
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
 // User storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  role: varchar("role").notNull().default("customer"), // admin, delivery_agent, customer
-  phone: varchar("phone"),
-  address: text("address"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey().notNull(),
+  email: text("email"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  profileImageUrl: text("profile_image_url"),
+  role: text("role", { enum: ["admin", "delivery_agent", "customer"] }).notNull().default("customer"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
-export const customers = pgTable("customers", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  name: varchar("name").notNull(),
-  email: varchar("email"),
-  phone: varchar("phone").notNull(),
+export const customers = sqliteTable("customers", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").references(() => users.id),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone").notNull(),
   address: text("address").notNull(),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
-export const deliveryAgents = pgTable("delivery_agents", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  name: varchar("name").notNull(),
-  phone: varchar("phone").notNull(),
+export const deliveryAgents = sqliteTable("delivery_agents", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").references(() => users.id),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
   vehicleInfo: text("vehicle_info"),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-  orderNumber: varchar("order_number").notNull().unique(),
+export const orders = sqliteTable("orders", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderNumber: text("order_number").notNull(),
   customerId: integer("customer_id").references(() => customers.id),
-  customerName: varchar("customer_name").notNull(),
-  customerPhone: varchar("customer_phone").notNull(),
+  customerName: text("customer_name").notNull(),
+  customerPhone: text("customer_phone").notNull(),
   deliveryAddress: text("delivery_address").notNull(),
-  quantity: integer("quantity").notNull(), // number of bags
+  quantity: integer("quantity").notNull(),
   totalLitres: integer("total_litres").notNull(),
-  status: varchar("status").notNull().default("pending"), // pending, assigned, in_transit, delivered, cancelled
+  status: text("status", { 
+    enum: ["pending", "assigned", "in_transit", "delivered", "cancelled"] 
+  }).notNull().default("pending"),
   deliveryAgentId: integer("delivery_agent_id").references(() => deliveryAgents.id),
-  preferredDeliveryTime: varchar("preferred_delivery_time"),
+  preferredDeliveryTime: text("preferred_delivery_time"),
   notes: text("notes"),
-  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
-  deliveredAt: timestamp("delivered_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  totalAmount: text("total_amount"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  deliveredAt: integer("delivered_at", { mode: "timestamp" }),
 });
 
-export const inventory = pgTable("inventory", {
-  id: serial("id").primaryKey(),
-  itemName: varchar("item_name").notNull(),
+export const inventory = sqliteTable("inventory", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  itemName: text("item_name").notNull(),
   currentStock: integer("current_stock").notNull().default(0),
   minThreshold: integer("min_threshold").notNull().default(10),
-  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }),
-  lastRestocked: timestamp("last_restocked"),
-  createdAt: timestamp("created_at").defaultNow(),
+  unitPrice: text("unit_price"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
-export const deliveries = pgTable("deliveries", {
-  id: serial("id").primaryKey(),
-  orderId: integer("order_id").references(() => orders.id),
-  deliveryAgentId: integer("delivery_agent_id").references(() => deliveryAgents.id),
-  status: varchar("status").notNull().default("assigned"), // assigned, picked_up, in_transit, delivered, failed
-  pickupTime: timestamp("pickup_time"),
-  deliveryTime: timestamp("delivery_time"),
+export const deliveries = sqliteTable("deliveries", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  deliveryAgentId: integer("delivery_agent_id").notNull().references(() => deliveryAgents.id),
+  status: text("status", { 
+    enum: ["assigned", "picked_up", "in_transit", "delivered", "failed"] 
+  }).notNull().default("assigned"),
+  pickupTime: integer("pickup_time", { mode: "timestamp" }),
+  deliveryTime: integer("delivery_time", { mode: "timestamp" }),
   notes: text("notes"),
-  customerSignature: text("customer_signature"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
-export const orderFeedback = pgTable("order_feedback", {
-  id: serial("id").primaryKey(),
-  orderId: integer("order_id").references(() => orders.id),
-  customerId: integer("customer_id").references(() => customers.id),
-  rating: integer("rating").notNull(), // 1-5 stars
+export const orderFeedback = sqliteTable("order_feedback", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  customerId: integer("customer_id").notNull().references(() => customers.id),
+  rating: integer("rating").notNull(),
   comment: text("comment"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
-  orders: many(orders),
+  customers: many(customers),
+  deliveryAgents: many(deliveryAgents),
 }));
 
 export const customersRelations = relations(customers, ({ one, many }) => ({
@@ -170,7 +170,7 @@ export const orderFeedbackRelations = relations(orderFeedback, ({ one }) => ({
   }),
 }));
 
-// Schema types
+// Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Customer = typeof customers.$inferSelect;

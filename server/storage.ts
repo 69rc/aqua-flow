@@ -299,7 +299,7 @@ export class DatabaseStorage implements IStorage {
       .update(inventory)
       .set({
         currentStock: stock,
-        lastRestocked: new Date(),
+        updatedAt: new Date(),
       })
       .where(eq(inventory.id, id))
       .returning();
