@@ -17,15 +17,14 @@ A comprehensive water delivery management system with role-based dashboards for 
 
 2. **Set up environment**
    ```bash
-   # Create .env.local file
-   echo "SESSION_SECRET=your-super-secret-key-change-this" > .env.local
-   echo "NODE_ENV=development" >> .env.local
+   # Environment file is already included (.env.local)
+   # No additional setup needed for local development
    ```
 
 3. **Initialize database**
    ```bash
    # Create SQLite database with tables
-   npm run db:push
+   tsx setup-db.ts
    
    # Seed with sample data
    tsx seed.ts

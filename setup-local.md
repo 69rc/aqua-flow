@@ -24,25 +24,17 @@ This guide will help you run the AquaFlow water delivery management system local
    ```
 
 3. **Environment Setup**
-   Create a `.env.local` file in the root directory:
-   ```env
-   SESSION_SECRET=your-super-secret-session-key-change-this-in-production
-   NODE_ENV=development
-   ```
+   The `.env.local` file is already included with the project. No additional setup needed.
 
 4. **Database Setup**
-   The app will automatically create a SQLite database file (`aquaflow.db`) in the project root.
+   Initialize the database with these commands:
    
-   Initialize the database schema:
    ```bash
-   # This creates the database tables
-   npm run db:push
-   ```
-
-   Seed the database with sample data:
-   ```bash
-   # This adds sample customers, agents, orders, etc.
-   npm run db:seed
+   # Create database tables
+   tsx setup-db.ts
+   
+   # Add sample data
+   tsx seed.ts
    ```
 
 5. **Start the Application**
